@@ -1,0 +1,180 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Quà Trung Thu 🎁</title>
+<style>
+  body {
+    margin: 0;
+    padding: 0;
+    font-family: "Segoe UI", sans-serif;
+    text-align: center;
+    background: radial-gradient(circle at top, #16222a, #3a6073);
+    overflow: hidden;
+    color: #fff8dc;
+  }
+
+  .moon {
+    position: absolute;
+    top: 40px;
+    right: 80px;
+    width: 140px;
+    height: 140px;
+    border-radius: 50%;
+    background: radial-gradient(circle at 30% 30%, #fffbe7, #ffe97f);
+    box-shadow: 0 0 50px 20px rgba(255,255,180,0.6);
+    z-index: 1;
+  }
+
+  .lantern {
+    position: absolute;
+    width: 70px;
+    top: -100px;
+    animation: swing 3s ease-in-out infinite alternate;
+  }
+  .lantern.left { left: 10%; animation-delay: 0s; }
+  .lantern.right { right: 10%; animation-delay: 1.5s; }
+
+  @keyframes swing {
+    0% { transform: rotate(-8deg) translateY(0); }
+    100% { transform: rotate(8deg) translateY(15px); }
+  }
+
+  h1 {
+    margin-top: 160px;
+    font-size: 2.2rem;
+    text-shadow: 0 0 10px #ffeab7;
+  }
+
+  p {
+    margin: 8px 30px;
+    font-size: 1.1rem;
+    color: #fffadc;
+  }
+
+  button {
+    margin-top: 20px;
+    padding: 12px 25px;
+    border-radius: 30px;
+    border: none;
+    background: #ffd966;
+    color: #5a3300;
+    font-weight: bold;
+    font-size: 1.1rem;
+    cursor: pointer;
+    transition: transform 0.2s, background 0.3s;
+  }
+  button:hover { background: #ffe7a1; transform: scale(1.05); }
+
+  .gift {
+    margin-top: 30px;
+    display: none;
+    animation: pop 1s ease;
+  }
+
+  @keyframes pop {
+    0% { transform: scale(0); opacity: 0; }
+    100% { transform: scale(1); opacity: 1; }
+  }
+
+  .gift img {
+    width: 250px;
+    border-radius: 20px;
+    box-shadow: 0 0 15px rgba(255,255,255,0.7);
+  }
+
+  canvas {
+    position: fixed;
+    top: 0;
+    left: 0;
+    pointer-events: none;
+  }
+</style>
+</head>
+<body>
+  <div class="moon"></div>
+  <img src="https://i.imgur.com/gS3EZ5t.png" class="lantern left" alt="Đèn lồng">
+  <img src="https://i.imgur.com/gS3EZ5t.png" class="lantern right" alt="Đèn lồng">
+
+  <h1>🌕 Chúc bạn Trung Thu vui vẻ 🎑</h1>
+  <p>Gửi tặng bạn món quà nhỏ chứa đầy niềm vui, yêu thương và ánh trăng vàng 💛</p>
+  <button onclick="openGift()">🎁 Mở quà</button>
+
+  <div class="gift" id="giftBox">
+    <h2>✨ Món quà của bạn ✨</h2>
+    <!-- 👉 Thay ảnh hoặc link video của bạn ở đây -->
+    <a href="https://www.youtube.com/watch?v=EmYqzdsJ4xk" target="_blank">
+      <img src="https://i.imgur.com/xEKKVmh.png" alt="Quà Trung Thu">
+    </a>
+    <p>Nhấn vào hình để xem 🎶</p>
+  </div>
+
+  <audio id="bgMusic" loop>
+    <source src="https://cdn.pixabay.com/download/audio/2022/10/14/audio_7f4a891dc2.mp3?filename=moonlight-123239.mp3" type="audio/mpeg">
+  </audio>
+
+  <canvas id="fireworks"></canvas>
+
+<script>
+  function openGift() {
+    document.getElementById("giftBox").style.display = "block";
+    document.getElementById("bgMusic").play();
+    launchFireworks();
+  }
+
+  // Hiệu ứng pháo hoa 🎆
+  const canvas = document.getElementById('fireworks');
+  const ctx = canvas.getContext('2d');
+  let W = window.innerWidth, H = window.innerHeight;
+  canvas.width = W; canvas.height = H;
+
+  const particles = [];
+  function random(min, max) { return Math.random() * (max - min) + min; }
+
+  function createFirework(x, y) {
+    const count = 50;
+    for (let i = 0; i < count; i++) {
+      const angle = (Math.PI * 2 * i) / count;
+      const speed = random(2, 5);
+      particles.push({
+        x, y,
+        vx: Math.cos(angle) * speed,
+        vy: Math.sin(angle) * speed,
+        life: random(50, 100),
+        color: `hsl(${random(0,360)},100%,70%)`
+      });
+    }
+  }
+
+  function launchFireworks() {
+    createFirework(W/2, H/2);
+    setInterval(()=> createFirework(random(100,W-100), random(100,H/2)), 1500);
+    animate();
+  }
+
+  function animate() {
+    ctx.fillStyle = "rgba(0,0,0,0.15)";
+    ctx.fillRect(0, 0, W, H);
+    for (let i = particles.length - 1; i >= 0; i--) {
+      const p = particles[i];
+      p.x += p.vx;
+      p.y += p.vy;
+      p.vy += 0.05;
+      p.life--;
+      if (p.life <= 0) particles.splice(i, 1);
+      ctx.beginPath();
+      ctx.arc(p.x, p.y, 2, 0, 2 * Math.PI);
+      ctx.fillStyle = p.color;
+      ctx.fill();
+    }
+    requestAnimationFrame(animate);
+  }
+
+  window.addEventListener("resize", () => {
+    W = window.innerWidth; H = window.innerHeight;
+    canvas.width = W; canvas.height = H;
+  });
+</script>
+</body>
+</html>
